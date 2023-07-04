@@ -1,5 +1,5 @@
 # CF-Merge
-GPU pairwise mergesort using a bank conflict free merging stage from \<add paper here\>.
+GPU pairwise mergesort using a bank conflict free merging stage from \<add paper here\>.  
 Experiments on a NVIDIA RTX 2080 Ti show that CF-Merge eliminates the slowdowns due to bank conflicts.
 
 [Throughput results (elements per microsecond) for Thrust and CF-Merge on a NVIDIA RTX 2080 Ti using the constructed worst-case inputs. Thrust results are in yellow and CF-Merge results are in blue.
@@ -21,16 +21,16 @@ Experimental setup:
 * Thrust v1.9.9
 
 ## Files
-1. `test/sort_int_random.cu` - Test harness for random inputs
+1. `test/sort_int_random.cu` - Test harness for random inputs  
 Command line arguments:
-* Total number of warps (positive power of 2 required)
-* RNG seed value
-2. `test/sort_int_worst.cu` - Test harness for constructed inputs
+   * Total number of warps (positive power of 2 required)
+   * RNG seed value
+3. `test/sort_int_worst.cu` - Test harness for constructed inputs  
 Command line arguments:
-* Total number of warps (positive power of 2 required)
-* Path of the directory containing binary files for the worst-case constructed inputs
-3. `sort.h` - Modified Thrust code using CF-Merge
-4. `Makefile` - Makefile for compiling test harness programs
+   * Total number of warps (positive power of 2 required)
+   * Path of the directory containing binary files for the worst-case constructed inputs
+4. `sort.h` - Modified Thrust code using CF-Merge
+5. `Makefile` - Makefile for compiling test harness programs
 
 ## Running CF-Merge
 1. Overwrite the default `sort.h` file in Thrust located in `thrust-1.9.9/thrust/system/cuda/detail/`
