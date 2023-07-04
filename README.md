@@ -19,6 +19,7 @@ Experimental setup:
 * NVIDIA RTX 2080 Ti
 * CUDA 11
 * Thrust v1.9.9
+* Worst-case inputs can be downloaded [here](https://drive.google.com/file/d/1C_rMS-vy2uVaeZgdT3fWa81foKt27cIx/view?usp=sharing)
 
 ## Files
 1. `test/sort_int_random.cu` - Test harness for random inputs  
