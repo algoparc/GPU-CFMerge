@@ -1,5 +1,5 @@
 # CF-Merge
-GPU pairwise mergesort using a bank conflict free merging stage from \<add paper here\>.  
+GPU pairwise mergesort using a bank conflict free merging stage from "Eliminating Bank Conflicts in GPU Mergesort".  
 Experiments on a NVIDIA RTX 2080 Ti show that CF-Merge eliminates the slowdowns due to bank conflicts.
 
 [Throughput results (elements per microsecond) for Thrust and CF-Merge on a NVIDIA RTX 2080 Ti using the constructed worst-case inputs. Thrust results are in yellow and CF-Merge results are in blue.
@@ -19,7 +19,7 @@ Experimental setup:
 * NVIDIA RTX 2080 Ti
 * CUDA 11
 * Thrust v1.9.9
-* Worst-case inputs can be downloaded [here](https://drive.google.com/file/d/1C_rMS-vy2uVaeZgdT3fWa81foKt27cIx/view?usp=sharing)
+* Worst-case inputs can be downloaded [here](https://drive.google.com/file/d/1_NlA1FIxeiKB1QPGh2iVKQKK3pocn43T/view?usp=sharing)
 
 ## Files
 1. `test/sort_int_random.cu` - Test harness for random inputs  
