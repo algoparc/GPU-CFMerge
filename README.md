@@ -1,4 +1,4 @@
-# CF-Merge
+# CF-Merge: Bank conflict free Thurst mergesort
 GPU pairwise mergesort using a bank conflict free merging stage from "Eliminating Bank Conflicts in GPU Mergesort".  
 Experiments on a NVIDIA RTX 2080 Ti show that CF-Merge eliminates the slowdowns due to bank conflicts.
 
