@@ -89,6 +89,7 @@ namespace __merge_sort {
     return keys1_begin;
   }
 
+  // New code start
   template <class KeysIt,
             class BinaryPred>
   THRUST_DEVICE_FUNCTION int
@@ -121,6 +122,7 @@ namespace __merge_sort {
     }
     return keys1_begin;
   }
+  // New code end
 
   template <class It, class T2, class CompareOp, int ITEMS_PER_THREAD>
   THRUST_DEVICE_FUNCTION void
@@ -466,7 +468,7 @@ namespace __merge_sort {
         }
       }    // func block_merge_sort
 
-
+      // New code start
       THRUST_DEVICE_FUNCTION void
       block_mergesort_modified(int tid,
                       int count,
@@ -493,9 +495,6 @@ namespace __merge_sort {
         int coop = 2;
         #pragma unroll
         for (; coop <= 32; coop *= 2) {
-          // if (blockIdx.x == 0 && tid == 0) printf("\ncoop = %d\n", coop);
-          // sync_threadblock();
-
           int lid  = tid - list;                                                  //local id within the subproblem
           int rank = (((tid / coop) * (coop >> 1)) + lid) * ITEMS_PER_THREAD;     //rank within A or B list
 
@@ -516,9 +515,6 @@ namespace __merge_sort {
           
           int size = ITEMS_PER_THREAD * (coop >> 1);     //number of elements in each sorted list
 
-          //int start = ITEMS_PER_THREAD * list;
-          //int size  = ITEMS_PER_THREAD * (coop >> 1);
-
           int diag = min(count,
                          ITEMS_PER_THREAD * ((coop - 1) & tid));
 
@@ -533,13 +529,6 @@ namespace __merge_sort {
                                                diag,
                                                compare_op);
 
-          // if (blockIdx.x == 0) {
-          //   printf("threadIdx.x = %d ==> keys1_beg = %d; keys2_beg = %d; diag = %d ==> partition_diag = %d\n", threadIdx.x, keys1_beg, keys2_beg, diag, partition_diag);
-          //   sync_threadblock();
-          // }
-
-
-
           int next_beg = __shfl_down_sync(0xffffffff, partition_diag, 1);
           if (lid == coop - 1) {
             next_beg = size;
@@ -549,14 +538,6 @@ namespace __merge_sort {
           
           int keys1_beg_loc = keys1_beg + partition_diag;           //shared memory index where the A list starts
           int keys2_beg_loc = keys2_beg - diag + partition_diag;    //shared memory index where the B list starts (ends at index (keys2_beg_loc - (ITEMS_PER_THREAD - count1))) 
-
-          // if (blockIdx.x == 0) {
-          //   sync_threadblock();
-          //   //printf("tid = %d; pid = %d; lid = %d ==> diag = %d; keys1_beg_loc = %d; next_beg = %d; count1 = %d\n", tid, pid, lid, diag, keys1_beg_loc, next_beg, count1);
-
-
-          //   printf("tid = %d; pid = %d; lid = %d ==> keys1_beg = %d; keys2_beg = %d ==> diag = %d; keys1_beg_loc = %d; keys2_beg_loc = %d; count1 = %d\n", tid, pid, lid, keys1_beg, keys2_beg, diag, keys1_beg_loc, keys2_beg_loc, count1);
-          // }
 
           int k = keys1_beg_loc % ITEMS_PER_THREAD;
 
@@ -640,29 +621,6 @@ namespace __merge_sort {
           }
         }
 
-        //VERIFY
-        /*sync_threadblock();
-        //write out to shmem
-        #pragma unroll
-        for (int ITEM = 0; ITEM < ITEMS_PER_THREAD; ++ITEM)
-        {
-          int idx                  = ITEMS_PER_THREAD * threadIdx.x + ITEM;
-          storage.keys_shared[idx] = keys_loc[ITEM];
-        }
-        sync_threadblock();
-        if (lane_id == 0) {
-          int err_count = 0;
-
-          for (int i = warp_id*32*ITEMS_PER_THREAD + 1; i < (warp_id+1)*32*ITEMS_PER_THREAD; ++i) {
-            if (storage.keys_shared[i] < storage.keys_shared[i-1]) {
-              printf("blockIdx.x == %d; warp_id = %d ==> %d: %d < %d: %d\n", blockIdx.x, warp_id, i, storage.keys_shared[i], i-1, storage.keys_shared[i-1]);
-              ++err_count;
-            }
-          }
-
-          if (err_count > 0) printf("per warp: blockIdx.x == %d; warp_id = %d; err_count = %d\n", blockIdx.x, warp_id, err_count);
-        }*/
-
         // intra-block rounds
         #pragma unroll
         for (; coop <= BLOCK_THREADS; coop *= 2) {
@@ -686,9 +644,6 @@ namespace __merge_sort {
           
           int size = ITEMS_PER_THREAD * (coop >> 1);     //number of elements in each sorted list
 
-          //int start = ITEMS_PER_THREAD * list;
-          //int size  = ITEMS_PER_THREAD * (coop >> 1);
-
           int diag = min(count,
                          ITEMS_PER_THREAD * ((coop - 1) & tid));
 
@@ -702,12 +657,6 @@ namespace __merge_sort {
                                                size,
                                                diag,
                                                compare_op);
-
-          // if (blockIdx.x == 0) {
-          //   printf("threadIdx.x = %d ==> keys1_beg = %d; keys2_beg = %d; diag = %d ==> partition_diag = %d\n", threadIdx.x, keys1_beg, keys2_beg, diag, partition_diag);
-          //   sync_threadblock();
-          // } 
-
 
           if (warp_id > 0 && lane_id == 0) storage.keys_shared[ITEMS_PER_TILE + warp_id - 1] = partition_diag;
 
@@ -729,15 +678,6 @@ namespace __merge_sort {
 
           int keys1_beg_loc = keys1_beg + partition_diag;           //shared memory index where the A list starts
           int keys2_beg_loc = keys2_beg - diag + partition_diag;    //shared memory index where the B list starts (ends at index (keys2_beg_loc - (ITEMS_PER_THREAD - count1))) 
-
-          // if (blockIdx.x == 0) {
-          //   sync_threadblock();
-          //   //printf("tid = %d; pid = %d; lid = %d ==> diag = %d; keys1_beg_loc = %d; next_beg = %d; count1 = %d\n", tid, pid, lid, diag, keys1_beg_loc, next_beg, count1);
-
-
-          //   printf("tid = %d; pid = %d; lid = %d ==> keys1_beg = %d; keys2_beg = %d ==> diag = %d; k   eys1_beg_loc = %d; keys2_beg_loc = %d; count1 = %d\n", tid, pid, lid, keys1_beg, keys2_beg, diag, keys1_beg_loc, keys2_beg_loc, count1);
-          // }
-
           
           int k = keys1_beg_loc % ITEMS_PER_THREAD;
 
@@ -820,31 +760,8 @@ namespace __merge_sort {
             }
           }
         }
-
-
-
-        /*//VERIFY
-        sync_threadblock();
-        //write out to shmem
-        #pragma unroll
-        for (int ITEM = 0; ITEM < ITEMS_PER_THREAD; ++ITEM)
-        {
-          int idx                  = ITEMS_PER_THREAD * threadIdx.x + ITEM;
-          storage.keys_shared[idx] = keys_loc[ITEM];
-        }
-        sync_threadblock();
-        if (threadIdx.x == 0) {
-          int err_count = 0;
-          for (int i = 1; i < ITEMS_PER_TILE; ++i) {
-            if (storage.keys_shared[i] < storage.keys_shared[i-1]) ++err_count;
-          }
-          if (err_count > 0) printf("blockIdx.x == %d; err_count = %d\n", blockIdx.x, err_count);
-        }*/
-
-
-
-
       }    // func block_merge_sort
+      // New code end
 
       //---------------------------------------------------------------------
       // Tile processing
@@ -913,17 +830,21 @@ namespace __merge_sort {
 
         if (IS_LAST_TILE)
         {
+          // New code start
           block_mergesort_modified(tid,
                           num_remaining,
                           keys_loc,
                           items_loc);
+          // New code end
         }
         else
         {
+          // New code start
           block_mergesort_modified(tid,
                           ITEMS_PER_TILE,
                           keys_loc,
                           items_loc);
+          // New code end
         }
 
         sync_threadblock();
@@ -1256,6 +1177,7 @@ namespace __merge_sort {
         }
       }
 
+      // New code start
       //reverses order of the B list in shared memory
       template <class T, class It>
       THRUST_DEVICE_FUNCTION void
@@ -1301,6 +1223,7 @@ namespace __merge_sort {
         }
         return keys1_begin;
       }
+      // New code end
 
       //---------------------------------------------------------------------
       // Tile processing
@@ -1501,6 +1424,7 @@ namespace __merge_sort {
         }
       }
 
+      // New code start
       template <bool IS_FULL_TILE>
       THRUST_DEVICE_FUNCTION void
       consume_tile_modified(int  tid,
@@ -1670,30 +1594,9 @@ namespace __merge_sort {
         }   // outer loop     
 
         sync_threadblock();
+        // New code end
 
-
-
-        // int keys1_end_loc = num_keys1;
-        // int keys2_beg_loc = diag0_loc - keys1_beg_loc;
-        // int keys2_end_loc = num_keys2;
-
-        // int num_keys1_loc = keys1_end_loc - keys1_beg_loc;
-        // int num_keys2_loc = keys2_end_loc - keys2_beg_loc;
-
-        // perform serial merge
-        //
         int indices[ITEMS_PER_THREAD];
-
-        // serial_merge(&storage.keys_shared[0],
-        //              keys1_beg_loc,
-        //              keys2_beg_loc + num_keys1,
-        //              num_keys1_loc,
-        //              num_keys2_loc,
-        //              keys_loc,
-        //              indices,
-        //              compare_op);
-
-        // sync_threadblock();
 
         // write keys
         //
@@ -1817,17 +1720,21 @@ namespace __merge_sort {
                                                  keys_count - tile_base));
         if (tile_idx < num_tiles - 1)
         {
+          // New code start
           consume_tile_modified<true>(tid,
                              tile_idx,
                              tile_base,
                              ITEMS_PER_TILE);
+          // New code end
         }
         else
         {
+          // New code start
           consume_tile_modified<false>(tid,
                               tile_idx,
                               tile_base,
                               items_in_tile);
+          // New code end
         }
       }
     };    // struct impl
