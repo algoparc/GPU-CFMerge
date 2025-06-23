@@ -1,17 +1,17 @@
 # CF-Merge: Bank conflict free GPU mergesort
-GPU pairwise mergesort using a bank conflict free merging stage from "Eliminating Bank Conflicts in GPU Mergesort".  
+GPU pairwise mergesort using a bank conflict free merging as described in [1].
 Experiments on a NVIDIA RTX 2080 Ti show that CF-Merge eliminates the slowdowns due to bank conflicts.
 
-[Throughput results (elements per microsecond) for Thrust and CF-Merge on a NVIDIA RTX 2080 Ti using the constructed worst-case inputs. Thrust results are in yellow and CF-Merge results are in blue.
+[Throughput results (elements per microsecond) for Thrust and CF-Merge on a NVIDIA RTX 2080 Ti using the constructed worst-case inputs. Thrust results are in red and CF-Merge results are in blue.
 The short dashed lines represent software parameters 15 elements per thread (E) and 512 threads per block (u); and the long dashed lines represent software parameters 17 elements per thread (E) and 256 threads per block (u). The x-axis is displayed on a logarithmic scale.](figures/rtx2080ti_sort_worst.pdf)
 
 [Throughput results (elements per microsecond) for Thrust and CF-Merge on a NVIDIA RTX 2080 Ti using parameters 15 elements per thread (E) and 512 threads per block (u).
-Thrust results are in yellow and CF-Merge results are in blue.
+Thrust results are in red and CF-Merge results are in blue.
 The dashed lines represent the constructed worst-case inputs and the dotted lines represent uniform random inputs.
 The x-axis is displayed on a logarithmic scale.](figures/rtx2080ti_sort_15.pdf)
 
 [Throughput results (elements per microsecond) for Thrust and CF-Merge on a NVIDIA RTX 2080 Ti using parameters 17 elements per thread (E)  and 256 threads per block (u).
-Thrust results are in yellow and CF-Merge results are in blue.
+Thrust results are in red and CF-Merge results are in blue.
 The dashed lines represent the constructed worst-case inputs and the dotted lines represent uniform random inputs.
 The x-axis is displayed on a logarithmic scale.](figures/rtx2080ti_sort_17.pdf)
 
@@ -51,3 +51,6 @@ make
 ./sort_int_random_17.out <total number of warps (positive power of 2 required)> <RNG seed value>
 ./sort_int_worst_17.out <total number of warps (positive power of 2 required)> <directory filepath>
 ```
+
+## References
+[1] Kyle Berney and Nodari Sitchinava. "[Eliminating bank conflicts in GPU mergesort](https://www2.hawaii.edu/~nodari/pubs/25-spaa.pdf)". In Proceedings of the 37th ACM Symposium on Parallelism in Algorithms and Architectures (SPAA), 2025. To appear. [https://doi.org/10.1145/3694906.3743337](https://doi.org/10.1145/3694906.3743337)
